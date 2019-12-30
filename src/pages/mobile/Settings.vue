@@ -6,6 +6,7 @@
     <Guide>
       <em>{{ $t('settings.title') }}</em>
     </Guide>
+    <RouterLink to="/example">to example</RouterLink>
     <AeCard fill="maximum">
       <ListItem
         :to="{ name: 'settings-network' }"

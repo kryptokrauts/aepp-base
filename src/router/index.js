@@ -40,6 +40,15 @@ export default (async () => {
     );
   }
 
+  router.addRoutes([{
+    name: 'example',
+    path: '/example',
+    beforeEnter: (to, from, next) => {
+      console.log('before enter example');
+      next({ name: 'transfer' });
+    },
+  }]);
+
   store.watch(
     (state, { loggedIn }) => loggedIn,
     (loggedIn) => {
