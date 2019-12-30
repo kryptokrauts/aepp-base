@@ -16,6 +16,7 @@
         <allow-intent href="market:*" />
         <preference name="SplashMaintainAspectRatio" value="true" />
         <preference name="HeaderColor" value="#f7296e" />
+        <preference name="AndroidLaunchMode" value="singleTask" />
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application android:usesCleartextTraffic="true" />
         </edit-config>

@@ -6,6 +6,7 @@ import {
   getPublicKeyByResponseUrl, getSignedTransactionByResponseUrl, generateSignRequestUrl,
 } from '../../../lib/airGap';
 import { i18n } from '../../plugins/ui/languages';
+import { STORAGE_DEEPLINK_KEY } from '../../../lib/constants';
 
 const TRANSPORT_QR_CODE = 'qr-code';
 const TRANSPORT_DEEP_LINK = 'deep-link';
@@ -17,6 +18,16 @@ export default {
     type: 'air-gap',
     getTypeVerbose: () => i18n.t('air-gap.account-name'),
     color: 'alternative',
+  },
+
+  state: {
+    deeplinkCallback: null,
+  },
+
+  mutations: {
+    setDeeplinkCallback(state, callback) {
+      state.deeplinkCallback = callback;
+    },
   },
 
   actions: process.env.IS_MOBILE_DEVICE ? {
@@ -47,19 +58,34 @@ export default {
 
     sign: () => Promise.reject(new Error('Not implemented yet')),
 
-    async signTransactionByDeepLink(store, requestUrl) {
-      window.startApp.set(
-        process.env.IS_IOS
-          ? requestUrl
-          : {
-            action: 'ACTION_VIEW',
-            uri: requestUrl,
-            flags: ['FLAG_ACTIVITY_NEW_TASK'],
-          },
-      ).start();
-
+    async signTransactionByDeepLink({ commit }, requestUrl) {
+      if (process.env.IS_CORDOVA) {
+        window.startApp.set(
+          process.env.IS_IOS
+            ? requestUrl
+            : {
+              action: 'ACTION_VIEW',
+              uri: requestUrl,
+              flags: ['FLAG_ACTIVITY_NEW_TASK'],
+            },
+        ).start();
+      } else {
+        window.location.href = requestUrl;
+      }
       return new Promise((resolve) => {
-        window.handleOpenURL = url => resolve(url);
+        if (process.env.IS_CORDOVA) {
+          commit('setDeeplinkCallback', resolve);
+          return;
+        }
+        const storageHandler = () => {
+          const result = localStorage.getItem(STORAGE_DEEPLINK_KEY);
+          if (result) {
+            localStorage.removeItem(STORAGE_DEEPLINK_KEY);
+            window.removeEventListener('storage', storageHandler);
+            resolve(result);
+          }
+        };
+        window.addEventListener('storage', storageHandler);
       });
     },
 

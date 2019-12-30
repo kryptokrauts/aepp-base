@@ -1,4 +1,5 @@
 import { merge } from 'lodash-es';
+import { NAME_LIST_ROUTE_NAMES, ROUTE_MOBILE_LOGGED_IN, STORAGE_DEEPLINK_KEY } from '../../lib/constants';
 import { ensureLoggedIn, mergeEnterHandlers } from '../utils';
 import store from '../../store/index';
 import AddToHomeScreenPrompt from '../../pages/mobile/AddToHomeScreenPrompt.vue';
@@ -147,18 +148,17 @@ export default [{
   path: '/vault/sync-completed',
   component: VaultSetupCompleted,
   beforeEnter: ensureLoggedIn,
-}, ...process.env.IS_CORDOVA
-  ? [{
-    name: 'vault-setup-same-device',
-    path: '/vault/same-device',
-    component: VaultSetupSameDevice,
-    beforeEnter: ensureLoggedIn,
-  }, {
-    name: 'vault-setup-same-device-sync',
-    path: '/vault/same-device/sync',
-    component: VaultSetupSameDeviceSync,
-    beforeEnter: ensureLoggedIn,
-  }] : [], {
+}, {
+  name: 'vault-setup-same-device',
+  path: '/vault/same-device',
+  component: VaultSetupSameDevice,
+  beforeEnter: ensureLoggedIn,
+}, {
+  name: 'vault-setup-same-device-sync',
+  path: '/vault/same-device/sync',
+  component: VaultSetupSameDeviceSync,
+  beforeEnter: ensureLoggedIn,
+}, {
   name: 'transfer',
   path: '/transfer',
   component: Transfer,
@@ -395,4 +395,20 @@ export default [{
   path: '/settings/language',
   component: SettingsLanguage,
   beforeEnter: ensureLoggedIn,
+}, {
+  name: 'airgap',
+  path: '/airgap',
+  beforeEnter: mergeEnterHandlers(
+    ensureLoggedIn,
+    (to, from, next) => {
+      const url = window.location.origin + to.fullPath;
+      if (process.env.IS_CORDOVA || process.env.IS_PWA) {
+        store.state.accounts.airGap.deeplinkCallback(url);
+        next(false);
+      } else {
+        localStorage.setItem(STORAGE_DEEPLINK_KEY, url);
+        next(ROUTE_MOBILE_LOGGED_IN);
+      }
+    },
+  ),
 }];

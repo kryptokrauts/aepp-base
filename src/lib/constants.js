@@ -17,3 +17,5 @@ export const PROTOCOL_DEFAULT = window.location.protocol === 'https:'
   || process.env.NODE_ENV === 'production' ? 'https:' : 'http:';
 
 export const ROUTE_MOBILE_LOGGED_IN = { name: 'transfer' };
+
+export const STORAGE_DEEPLINK_KEY = 'deeplink';
