@@ -42,6 +42,6 @@ deploy:
       - aeternity.tar.gz
       - aeternity.apk
       - aeternity.app.tar.gz
-    skip_cleanup: true
+    skip_cleanup: false
     on:
       tags: true
