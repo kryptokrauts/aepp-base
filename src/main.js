@@ -5,9 +5,7 @@ import store from './store';
 
 Vue.config.productionTip = false;
 
-if (process.env.NODE_ENV === 'development') {
-  window.store = store;
-}
+window.store = store;
 
 if (process.env.RUNNING_IN_POPUP) import(/* webpackChunkName: "popup" */ './popup');
 else if (!process.env.RUNNING_IN_FRAME) import(/* webpackChunkName: "ui" */ './ui');
